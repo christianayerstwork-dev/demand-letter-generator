@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { generateLetter } from '@/lib/letterTemplate';
 import { format } from 'date-fns';
 import { calculateStatistics, Statistics } from '@/lib/statisticsUtils';
+import { Attachment } from '@/types';
 
 interface Submission {
   id: string;
@@ -879,7 +880,7 @@ export default function AdminDashboard() {
                     Supporting Documents ({selectedSubmission.letterData.attachments.length})
                   </h4>
                   <div className="space-y-2">
-                    {selectedSubmission.letterData.attachments.map((attachment, index) => (
+                    {selectedSubmission.letterData.attachments.map((attachment: Attachment, index: number) => (
                       <div key={index} className="flex items-center justify-between bg-white p-3 rounded border border-blue-200">
                         <div className="flex items-center gap-2 flex-1 min-w-0">
                           <svg className="w-4 h-4 flex-shrink-0 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">

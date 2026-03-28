@@ -10,7 +10,9 @@
       "WebSearch",
       "Bash(xargs kill -9)",
       "Bash(curl -v http://localhost:3002/api/admin/auth/verify)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npm run build:*)"
     ],
     "deny": [],
     "ask": []

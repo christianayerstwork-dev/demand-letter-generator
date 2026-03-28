@@ -22,10 +22,11 @@ interface EmailOptions {
 export async function sendDemandLetter(options: EmailOptions) {
   try {
     // Generate PDF buffer
+    // @ts-expect-error - @react-pdf types don't match but work correctly at runtime
     const stream = await renderToStream(React.createElement(LetterPDF, { data: options.letterData }));
     const chunks: Uint8Array[] = [];
     for await (const chunk of stream) {
-      chunks.push(chunk);
+      chunks.push(chunk as Uint8Array);
     }
     const pdfBuffer = Buffer.concat(chunks);
 
@@ -266,18 +267,20 @@ export async function sendClientConfirmation(letterData: LetterData) {
 export async function sendSelfDeliveryLetter(letterData: LetterData) {
   try {
     // Generate demand letter PDF
+    // @ts-expect-error - @react-pdf types don't match but work correctly at runtime
     const letterStream = await renderToStream(React.createElement(LetterPDF, { data: letterData }));
     const letterChunks: Uint8Array[] = [];
     for await (const chunk of letterStream) {
-      letterChunks.push(chunk);
+      letterChunks.push(chunk as Uint8Array);
     }
     const letterPdfBuffer = Buffer.concat(letterChunks);
 
     // Generate certificate of service PDF
+    // @ts-expect-error - @react-pdf types don't match but work correctly at runtime
     const certificateStream = await renderToStream(React.createElement(CertificateOfService, { data: letterData }));
     const certificateChunks: Uint8Array[] = [];
     for await (const chunk of certificateStream) {
-      certificateChunks.push(chunk);
+      certificateChunks.push(chunk as Uint8Array);
     }
     const certificatePdfBuffer = Buffer.concat(certificateChunks);
 

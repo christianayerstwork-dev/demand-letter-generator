@@ -17,12 +17,13 @@ export async function POST(request: NextRequest) {
     }
 
     // Generate PDF using createElement
+    // @ts-expect-error - @react-pdf types don't match but work correctly at runtime
     const stream = await renderToStream(React.createElement(LetterPDF, { data }));
 
     // Convert stream to buffer
     const chunks: Uint8Array[] = [];
     for await (const chunk of stream) {
-      chunks.push(chunk);
+      chunks.push(chunk as Uint8Array);
     }
     const buffer = Buffer.concat(chunks);
 

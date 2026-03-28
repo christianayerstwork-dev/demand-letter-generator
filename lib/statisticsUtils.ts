@@ -83,7 +83,7 @@ export function calculateStatistics(submissions: Submission[]): Statistics {
   const fullPaymentRate = (totalPaid / totalSent) * 100;
 
   // Financial metrics
-  const totalAmountClaimed = sentSubmissions.reduce((sum, s) => sum + parseFloat(s.letterData.amountOwed || 0), 0);
+  const totalAmountClaimed = sentSubmissions.reduce((sum, s) => sum + parseFloat(s.letterData.amountOwed || '0'), 0);
   const averageClaimAmount = totalAmountClaimed / totalSent;
 
   // Calculate total recovered and recovery rates
@@ -94,7 +94,7 @@ export function calculateStatistics(submissions: Submission[]): Statistics {
     }
     // If no payment amount specified but status is paid, assume full amount
     if (s.paymentStatus === 'paid') {
-      return sum + parseFloat(s.letterData.amountOwed || 0);
+      return sum + parseFloat(s.letterData.amountOwed || '0');
     }
     return sum;
   }, 0);
@@ -261,7 +261,7 @@ function analyzeDeliveryMethod(submissions: Submission[]) {
 function calculateRecoveryRate(submissions: Submission[]): number {
   if (submissions.length === 0) return 0;
 
-  const totalClaimed = submissions.reduce((sum, s) => sum + parseFloat(s.letterData.amountOwed || 0), 0);
+  const totalClaimed = submissions.reduce((sum, s) => sum + parseFloat(s.letterData.amountOwed || '0'), 0);
   if (totalClaimed === 0) return 0;
 
   const totalRecovered = submissions.reduce((sum, s) => {
@@ -269,7 +269,7 @@ function calculateRecoveryRate(submissions: Submission[]): number {
       return sum + parseFloat(s.paymentAmount.toString());
     }
     if (s.paymentStatus === 'paid') {
-      return sum + parseFloat(s.letterData.amountOwed || 0);
+      return sum + parseFloat(s.letterData.amountOwed || '0');
     }
     return sum;
   }, 0);

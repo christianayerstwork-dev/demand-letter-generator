@@ -22,7 +22,10 @@ function loadSessions(): Map<string, { username: string; createdAt: number }> {
 // Save sessions to file
 function saveSessions() {
   try {
-    const obj = Object.fromEntries(sessions.entries());
+    const obj: Record<string, { username: string; createdAt: number }> = {};
+    sessions.forEach((value, key) => {
+      obj[key] = value;
+    });
     fs.writeFileSync(SESSION_FILE, JSON.stringify(obj, null, 2));
   } catch (error) {
     console.error('Failed to save sessions:', error);
@@ -43,11 +46,13 @@ const SESSION_MAX_AGE = 24 * 60 * 60 * 1000; // 24 hours
  */
 export function cleanupSessions() {
   const now = Date.now();
-  for (const [sessionId, session] of sessions.entries()) {
+  const toDelete: string[] = [];
+  sessions.forEach((session, sessionId) => {
     if (now - session.createdAt > SESSION_MAX_AGE) {
-      sessions.delete(sessionId);
+      toDelete.push(sessionId);
     }
-  }
+  });
+  toDelete.forEach(sessionId => sessions.delete(sessionId));
 }
 
 /**

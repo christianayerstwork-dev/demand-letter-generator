@@ -6,7 +6,7 @@ import { validateClaimDescription } from '@/lib/contentValidation';
 import { addSubmission } from '@/lib/submissionStore';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-11-20.acacia',
+  apiVersion: '2025-11-17.clover',
 });
 
 // This is needed to handle raw body for webhook signature verification
@@ -56,6 +56,9 @@ export async function POST(request: NextRequest) {
             clientPhone: session.metadata!.clientPhone || undefined,
             relationshipToDebtor: session.metadata!.relationshipToDebtor as any,
             relationshipOther: session.metadata!.relationshipOther || undefined,
+            bankName: session.metadata!.bankName || '',
+            sortCode: session.metadata!.sortCode || '',
+            accountNumber: session.metadata!.accountNumber || '',
           },
           debtorName: session.metadata!.debtorName,
           debtorAddress: session.metadata!.debtorAddress,
@@ -64,6 +67,8 @@ export async function POST(request: NextRequest) {
           paymentDate: session.metadata!.paymentDate,
           claimDescription: session.metadata!.claimDescription,
           tone: session.metadata!.tone as any,
+          deliveryMethod: (session.metadata!.deliveryMethod as any) || 'email',
+          attachments: [],
         };
 
         // Validate the claim description
