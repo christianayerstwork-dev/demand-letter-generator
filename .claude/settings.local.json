@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(lsof:*)",
+      "Bash(npm run dev:*)",
+      "Bash(node scripts/add-test-data.js:*)",
+      "Bash(pkill:*)",
+      "Bash(cat:*)",
+      "Bash(node test-resend.js:*)",
+      "WebSearch",
+      "Bash(xargs kill -9)",
+      "Bash(curl -v http://localhost:3002/api/admin/auth/verify)",
+      "Bash(curl:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
