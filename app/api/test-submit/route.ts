@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { LetterData } from '@/types';
 import { validateClaimDescription } from '@/lib/contentValidation';
 import { addSubmission } from '@/lib/submissionStore';
-import { sendAdminNotification } from '@/lib/emailService';
+import { sendAdminNotification, sendSubmissionConfirmation } from '@/lib/emailService';
 
 /**
  * TEST ENDPOINT - Bypasses Stripe payment
@@ -50,6 +50,22 @@ export async function POST(request: NextRequest) {
     } catch (emailError) {
       // Don't fail the submission if email fails
       console.error('Failed to send admin notification:', emailError);
+    }
+
+    // Send client confirmation email
+    try {
+      await sendSubmissionConfirmation({
+        submissionId: submission.id,
+        clientName: letterData.client.clientName,
+        clientEmail: letterData.client.clientEmail,
+        debtorName: letterData.debtorName,
+        amountOwed: letterData.amountOwed,
+        claimDescription: letterData.claimDescription,
+      });
+      console.log('Client confirmation sent for submission:', submission.id);
+    } catch (emailError) {
+      // Don't fail the submission if email fails
+      console.error('Failed to send client confirmation:', emailError);
     }
 
     return NextResponse.json({

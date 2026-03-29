@@ -603,3 +603,95 @@ export async function sendAdminNotification(options: {
     throw error;
   }
 }
+
+/**
+ * Sends a submission confirmation email to the client
+ */
+export async function sendSubmissionConfirmation(options: {
+  submissionId: string;
+  clientName: string;
+  clientEmail: string;
+  debtorName: string;
+  amountOwed: string;
+  claimDescription: string;
+}) {
+  try {
+    const shortId = options.submissionId.slice(-8).toUpperCase();
+    const resend = getResendClient();
+
+    const { data, error } = await resend.emails.send({
+      from: 'Smart Settle Go <onboarding@resend.dev>',
+      to: options.clientEmail,
+      subject: 'Submission Received - Your Demand Letter is Being Reviewed',
+      html: `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+
+  <div style="background-color: #10b981; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
+    <h1 style="margin: 0; font-size: 24px;">✓ Submission Received</h1>
+  </div>
+
+  <div style="background-color: #f8f9fa; padding: 30px; border-radius: 0 0 8px 8px;">
+    <p>Dear ${options.clientName},</p>
+
+    <p>Thank you for submitting your demand letter through Smart Settle Go. We have received your submission and it is now being reviewed by our admin team.</p>
+
+    <div style="background-color: white; padding: 20px; border-left: 4px solid #10b981; margin: 20px 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+      <h3 style="margin-top: 0; color: #10b981;">Submission Details</h3>
+      <p style="margin: 5px 0;"><strong>Reference Number:</strong> ${shortId}</p>
+      <p style="margin: 5px 0;"><strong>Debtor:</strong> ${options.debtorName}</p>
+      <p style="margin: 5px 0;"><strong>Amount:</strong> £${options.amountOwed}</p>
+      <p style="margin: 5px 0;"><strong>Claim:</strong> ${options.claimDescription}</p>
+      <p style="margin: 5px 0;"><strong>Submitted:</strong> ${new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
+    </div>
+
+    <h3 style="color: #2563eb;">What Happens Next?</h3>
+    <ul style="padding-left: 20px; line-height: 1.8;">
+      <li><strong>Review:</strong> Our admin team will review your submission within 24 hours</li>
+      <li><strong>Approval:</strong> Once approved, your demand letter will be sent to ${options.debtorName}</li>
+      <li><strong>Notification:</strong> You'll receive a confirmation email when the letter has been sent</li>
+      <li><strong>Tracking:</strong> We'll keep you updated on the status of your submission</li>
+    </ul>
+
+    <div style="background-color: #e0f2fe; border-left: 4px solid #0284c7; padding: 15px; margin: 20px 0;">
+      <p style="margin: 0; font-size: 14px; color: #075985;">
+        <strong>Important:</strong> Please keep your reference number (${shortId}) for your records. You can use this to track your submission if needed.
+      </p>
+    </div>
+
+    <div style="background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 15px; margin: 20px 0;">
+      <p style="margin: 0; font-size: 14px; color: #92400e;">
+        <strong>Need to make changes?</strong> If you need to update any information in your submission, please reply to this email with your reference number.
+      </p>
+    </div>
+
+    <hr style="border: none; border-top: 1px solid #ddd; margin: 30px 0;">
+
+    <p style="font-size: 12px; color: #999; text-align: center; margin: 0;">
+      Thank you for using Smart Settle Go<br>
+      <a href="https://www.smart-settle-go.com" style="color: #2563eb; text-decoration: none;">www.smart-settle-go.com</a>
+    </p>
+  </div>
+
+</body>
+</html>
+      `.trim(),
+    });
+
+    if (error) {
+      console.error('Submission confirmation email error:', error);
+      throw new Error(`Failed to send submission confirmation: ${error.message}`);
+    }
+
+    console.log('Submission confirmation sent:', data);
+    return { success: true, emailId: data?.id };
+  } catch (error) {
+    console.error('Submission confirmation error:', error);
+    throw error;
+  }
+}
