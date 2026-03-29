@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { LetterData } from '@/types';
-import { sendDemandLetter, sendClientConfirmation } from '@/lib/emailService';
+import { sendDemandLetter, sendClientConfirmation, sendSubmissionConfirmation, sendAdminNotification } from '@/lib/emailService';
 import { validateClaimDescription } from '@/lib/contentValidation';
 import { addSubmission } from '@/lib/submissionStore';
 
@@ -78,14 +78,44 @@ export async function POST(request: NextRequest) {
         if (validation.requiresAdminReview) {
           console.log('Submission requires admin review:', session.id);
 
-          addSubmission({
+          const submission = addSubmission({
             letterData,
             stripeSessionId: session.id,
             flaggedReasons: validation.warnings,
           });
 
           console.log('Submission stored for admin review');
-          // Note: Email will be sent after admin approval
+
+          // Send admin notification
+          try {
+            await sendAdminNotification({
+              submissionId: submission.id,
+              clientName: letterData.client.clientName,
+              clientEmail: letterData.client.clientEmail,
+              debtorName: letterData.debtorName,
+              amountOwed: letterData.amountOwed,
+              claimDescription: letterData.claimDescription,
+              flaggedReasons: submission.flaggedReasons,
+            });
+            console.log('Admin notification sent for submission:', submission.id);
+          } catch (emailError) {
+            console.error('Failed to send admin notification:', emailError);
+          }
+
+          // Send client confirmation that submission is under review
+          try {
+            await sendSubmissionConfirmation({
+              submissionId: submission.id,
+              clientName: letterData.client.clientName,
+              clientEmail: letterData.client.clientEmail,
+              debtorName: letterData.debtorName,
+              amountOwed: letterData.amountOwed,
+              claimDescription: letterData.claimDescription,
+            });
+            console.log('Client confirmation sent for submission:', submission.id);
+          } catch (emailError) {
+            console.error('Failed to send client confirmation:', emailError);
+          }
         } else {
           // Send immediately if no review needed
           await sendDemandLetter({
