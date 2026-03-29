@@ -45,7 +45,8 @@ export interface Submission {
   caseNotes?: string;
 }
 
-const DATA_DIR = path.join(process.cwd(), 'data');
+// Use /tmp directory on Vercel (serverless), local data directory otherwise
+const DATA_DIR = process.env.VERCEL ? '/tmp/data' : path.join(process.cwd(), 'data');
 const SUBMISSIONS_FILE = path.join(DATA_DIR, 'submissions.json');
 
 // Ensure data directory exists

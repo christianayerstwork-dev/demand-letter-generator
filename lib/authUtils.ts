@@ -3,7 +3,10 @@ import path from 'path';
 
 // File-based session store for development (survives hot reloads)
 // In production, use Redis or a database
-const SESSION_FILE = path.join(process.cwd(), '.sessions.json');
+// Use /tmp on Vercel (serverless environment)
+const SESSION_FILE = process.env.VERCEL
+  ? '/tmp/.sessions.json'
+  : path.join(process.cwd(), '.sessions.json');
 
 // Load existing sessions from file
 function loadSessions(): Map<string, { username: string; createdAt: number }> {

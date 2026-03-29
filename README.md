@@ -202,6 +202,12 @@ To change, update `STRIPE_PRICE_AMOUNT` in `.env.local`:
 
 Use **live Stripe keys** and **verified Resend domain** for production.
 
+**⚠️ Important Note about Storage:**
+- The app currently uses file-based storage (`/tmp` on Vercel)
+- Data stored in `/tmp` is ephemeral and will be lost between deployments or when serverless functions scale down
+- **For production use, migrate to a database** (Postgres, MongoDB, etc.) to persist submissions and sessions
+- This is suitable for testing but NOT recommended for production with real customer data
+
 ## Admin Access
 
 To access the admin dashboard:
