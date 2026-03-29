@@ -5,7 +5,19 @@ import React from 'react';
 import { LetterPDF } from './pdfGenerator';
 import { CertificateOfService } from './certificateGenerator';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Lazy initialization - only create Resend client when needed (at runtime)
+let resendClient: Resend | null = null;
+
+function getResendClient(): Resend {
+  if (!resendClient) {
+    const apiKey = process.env.RESEND_API_KEY;
+    if (!apiKey) {
+      throw new Error('RESEND_API_KEY is not configured');
+    }
+    resendClient = new Resend(apiKey);
+  }
+  return resendClient;
+}
 
 interface EmailOptions {
   to: string;
@@ -53,6 +65,7 @@ export async function sendDemandLetter(options: EmailOptions) {
 
     // Send email with PDF attachment
     console.log(`📧 Attempting to send email TO: ${options.to}, CC: ${options.cc || 'none'}`);
+    const resend = getResendClient();
     const { data, error } = await resend.emails.send({
       from: 'Smart Settle Go <onboarding@resend.dev>',
       to: options.to,
@@ -189,6 +202,7 @@ function generateEmailHTML(letterData: LetterData, paymentLink?: string, submiss
  */
 export async function sendClientConfirmation(letterData: LetterData) {
   try {
+    const resend = getResendClient();
     const { data, error } = await resend.emails.send({
       from: 'Smart Settle Go <onboarding@resend.dev>',
       to: letterData.client.clientEmail,
@@ -310,6 +324,7 @@ export async function sendSelfDeliveryLetter(letterData: LetterData) {
       });
     }
 
+    const resend = getResendClient();
     const { data, error } = await resend.emails.send({
       from: 'Smart Settle Go <onboarding@resend.dev>',
       to: letterData.client.clientEmail,
@@ -417,6 +432,7 @@ export async function sendRejectionEmail(options: {
   rejectionReason: string;
 }) {
   try {
+    const resend = getResendClient();
     const { data, error } = await resend.emails.send({
       from: 'Smart Settle Go <onboarding@resend.dev>',
       to: options.to,
@@ -510,6 +526,7 @@ export async function sendAdminNotification(options: {
     const reviewUrl = `${baseUrl}/admin`;
     const shortId = options.submissionId.slice(-8).toUpperCase();
 
+    const resend = getResendClient();
     const { data, error } = await resend.emails.send({
       from: 'Smart Settle Go <onboarding@resend.dev>',
       to: adminEmail,
