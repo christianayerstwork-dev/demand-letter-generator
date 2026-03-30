@@ -15,7 +15,8 @@
       "Bash(npm run build:*)",
       "Bash(git add:*)",
       "Bash(git commit -m \"$(cat <<''EOF''\nFix Vercel deployment: Use /tmp for file storage in serverless environment\n\n- Modified submissionStore.ts to use /tmp/data on Vercel\n- Modified authUtils.ts to use /tmp/.sessions.json on Vercel\n- Updated README with warning about ephemeral storage\n- Fixes \"Failed to submit\" error on Vercel due to read-only filesystem\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
-      "Bash(git push)"
+      "Bash(git push)",
+      "Bash(git commit:*)"
     ],
     "deny": [],
     "ask": []

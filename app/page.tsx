@@ -360,10 +360,10 @@ export default function Home() {
                     onChange={handleInputChange}
                     className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
-                    <option value="landlord">Landlord</option>
                     <option value="company">Company/Business</option>
-                    <option value="individual">Individual/Personal</option>
                     <option value="guarantor">Guarantor</option>
+                    <option value="individual">Individual/Personal</option>
+                    <option value="landlord">Landlord</option>
                     <option value="other">Other</option>
                   </select>
                 </div>

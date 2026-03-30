@@ -59,16 +59,16 @@ const toneVariations = {
     greeting: 'Dear',
     opening: (relationship: string) => `Your details have been provided to us by your ${relationship}.\n\nYou are hereby notified that you have an outstanding debt of`,
     payment: 'Payment in full is required within',
-    consequence: 'Failure to make payment will result in immediate escalation to debt recovery specialists and may lead to legal proceedings being commenced against you without further notice.',
-    communication: (relationship: string) => `All communications must be directed to your ${relationship}. This letter serves as formal notice.`,
+    consequence: 'Failure to make payment may result in immediate escalatory action being taken against you without further notice.',
+    communication: (relationship: string) => `All communications must be directed to your ${relationship}. All the debtor's rights remain expressly reserved. This letter serves as formal notice.`,
     closing: 'Yours faithfully,'
   },
   aggressive: {
     greeting: 'Dear',
     opening: (relationship: string) => `Your ${relationship} has instructed us to pursue recovery of outstanding monies owed by you.\n\nYou currently owe`,
     payment: 'You are required to make full payment within',
-    consequence: 'Be advised that failure to pay will result in immediate legal action. This may include county court proceedings, additional costs, and damage to your credit rating. We will not hesitate to pursue all available legal remedies.',
-    communication: (relationship: string) => `Direct all communications to your ${relationship} immediately. This is your final notice before legal proceedings commence.`,
+    consequence: 'Be advised that failure to pay will result in immediate legal action. This may include county court proceedings, additional costs, and damage to the debtor\'s credit rating. The client will not hesitate to pursue all available legal remedies.',
+    communication: (relationship: string) => `Direct all communications to your ${relationship} immediately. All the debtor's rights remain expressly reserved. This is your final notice before legal proceedings commence.`,
     closing: 'Yours faithfully,'
   }
 };

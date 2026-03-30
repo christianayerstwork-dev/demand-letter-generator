@@ -118,8 +118,18 @@ export const LetterPDF: React.FC<LetterPDFProps> = ({ data }) => {
           <Text>{letterContent.closing}</Text>
         </View>
 
-        {/* Signature */}
-        <Text style={styles.signature}>{letterContent.signature}</Text>
+        {/* Signature Box */}
+        <View style={{ marginTop: 20, marginBottom: 10 }}>
+          <View style={{
+            borderBottom: '1pt solid #000',
+            width: 200,
+            paddingBottom: 30,
+            marginBottom: 5
+          }}>
+            {/* Placeholder for handwritten signature - in future, this can be an actual image */}
+          </View>
+          <Text style={styles.signature}>{letterContent.signature}</Text>
+        </View>
 
         {/* Bank Details (if provided) */}
         {(data.client.bankName || data.client.accountNumber || data.client.sortCode) && (
