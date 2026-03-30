@@ -34,6 +34,7 @@ export default function Home() {
   const [showPreview, setShowPreview] = useState(false);
   const [claimValidation, setClaimValidation] = useState<ReturnType<typeof validateClaimDescription> | null>(null);
   const [uploadingFile, setUploadingFile] = useState(false);
+  const [showValidation, setShowValidation] = useState(false); // Track if we should show validation errors
 
   // Calculate form completion percentage
   const calculateProgress = (): number => {
@@ -50,6 +51,15 @@ export default function Home() {
 
     const filledFields = requiredFields.filter(field => field && field.toString().trim().length > 0).length;
     return Math.round((filledFields / requiredFields.length) * 100);
+  };
+
+  // Helper to get input class with validation
+  const getInputClass = (value: string, baseClass: string = "w-full px-4 py-2 border rounded-md focus:ring-2 focus:border-transparent") => {
+    const isEmpty = !value || value.trim().length === 0;
+    if (showValidation && isEmpty) {
+      return `${baseClass} border-red-500 focus:ring-red-500 bg-red-50`;
+    }
+    return `${baseClass} border-gray-300 focus:ring-blue-500`;
   };
 
   // Update letter preview when form changes
@@ -194,6 +204,28 @@ export default function Home() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Check if all required fields are filled
+    const requiredFieldsCheck = [
+      { value: formData.client.clientName, name: 'Your Name' },
+      { value: formData.client.clientEmail, name: 'Your Email' },
+      { value: formData.debtorName, name: 'Debtor Name' },
+      { value: formData.debtorAddress, name: 'Debtor Address' },
+      { value: formData.deliveryMethod === 'email' ? formData.debtorEmail : 'ok', name: 'Debtor Email' },
+      { value: formData.amountOwed, name: 'Amount Owed' },
+      { value: formData.claimDescription, name: 'Claim Description' },
+    ];
+
+    const missingFields = requiredFieldsCheck.filter(field => !field.value || field.value.trim().length === 0);
+
+    if (missingFields.length > 0) {
+      setShowValidation(true);
+      const fieldNames = missingFields.map(f => f.name).join(', ');
+      alert(`Please fill in the following required fields: ${fieldNames}`);
+      // Scroll to top to see highlighted fields
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
     try {
       // FOR TESTING: Bypass Stripe and directly create submission
       // In production, this would go through Stripe checkout first
@@ -290,7 +322,7 @@ export default function Home() {
                     value={formData.client.clientName}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={getInputClass(formData.client.clientName)}
                     placeholder="Jane Doe"
                   />
                 </div>
@@ -306,7 +338,7 @@ export default function Home() {
                     value={formData.client.clientEmail}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={getInputClass(formData.client.clientEmail)}
                     placeholder="jane@example.com"
                   />
                 </div>
@@ -436,7 +468,7 @@ export default function Home() {
                   value={formData.debtorName}
                   onChange={handleInputChange}
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className={getInputClass(formData.debtorName)}
                   placeholder="John Smith"
                 />
               </div>
@@ -452,7 +484,7 @@ export default function Home() {
                   value={formData.debtorAddress}
                   onChange={handleInputChange}
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className={getInputClass(formData.debtorAddress)}
                   placeholder="123 High Street, London, SW1A 1AA"
                 />
               </div>
@@ -468,7 +500,7 @@ export default function Home() {
                   value={formData.debtorEmail}
                   onChange={handleInputChange}
                   required={formData.deliveryMethod === 'email'}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className={formData.deliveryMethod === 'email' ? getInputClass(formData.debtorEmail) : "w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"}
                   placeholder="john.smith@example.com"
                 />
               </div>
@@ -528,7 +560,7 @@ export default function Home() {
                   required
                   min="0"
                   step="0.01"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className={getInputClass(formData.amountOwed)}
                   placeholder="1500.00"
                 />
               </div>
@@ -603,6 +635,8 @@ export default function Home() {
                   className={`w-full px-4 py-2 border rounded-md focus:ring-2 focus:border-transparent ${
                     claimValidation?.hasWarnings || claimValidation?.errors.length
                       ? 'border-yellow-500 focus:ring-yellow-500'
+                      : showValidation && (!formData.claimDescription || formData.claimDescription.trim().length === 0)
+                      ? 'border-red-500 focus:ring-red-500 bg-red-50'
                       : 'border-gray-300 focus:ring-blue-500'
                   }`}
                   placeholder="e.g., Unpaid rent for November 2024"
@@ -686,7 +720,7 @@ export default function Home() {
                   Company Logo (Optional)
                 </label>
                 <p className="text-xs text-gray-600 mb-3">
-                  Upload your company logo to appear on the letterhead (PNG, JPG, max 1MB)
+                  Upload your company logo to appear on the letterhead (PNG, JPG, max 5MB)
                 </p>
                 <div className="flex items-center gap-4">
                   <input
@@ -696,8 +730,8 @@ export default function Home() {
                     onChange={async (e) => {
                       const file = e.target.files?.[0];
                       if (!file) return;
-                      if (file.size > 1024 * 1024) {
-                        alert('Logo file must be less than 1MB');
+                      if (file.size > 5 * 1024 * 1024) {
+                        alert('Logo file must be less than 5MB');
                         return;
                       }
                       const base64 = await new Promise<string>((resolve) => {
@@ -736,7 +770,7 @@ export default function Home() {
                   Signature (Optional)
                 </label>
                 <p className="text-xs text-gray-600 mb-3">
-                  Upload a signature image to personalize your letter (PNG with transparent background recommended, max 500KB)
+                  Upload a signature image to personalize your letter (PNG with transparent background recommended, max 2MB)
                 </p>
                 <div className="flex items-center gap-4">
                   <input
@@ -746,8 +780,8 @@ export default function Home() {
                     onChange={async (e) => {
                       const file = e.target.files?.[0];
                       if (!file) return;
-                      if (file.size > 512 * 1024) {
-                        alert('Signature file must be less than 500KB');
+                      if (file.size > 2 * 1024 * 1024) {
+                        alert('Signature file must be less than 2MB');
                         return;
                       }
                       const base64 = await new Promise<string>((resolve) => {
