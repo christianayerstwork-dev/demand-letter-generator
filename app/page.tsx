@@ -321,7 +321,6 @@ export default function Home() {
                     name="client.clientName"
                     value={formData.client.clientName}
                     onChange={handleInputChange}
-                    required
                     className={getInputClass(formData.client.clientName)}
                     placeholder="Jane Doe"
                   />
@@ -337,7 +336,6 @@ export default function Home() {
                     name="client.clientEmail"
                     value={formData.client.clientEmail}
                     onChange={handleInputChange}
-                    required
                     className={getInputClass(formData.client.clientEmail)}
                     placeholder="jane@example.com"
                   />
@@ -467,7 +465,6 @@ export default function Home() {
                   name="debtorName"
                   value={formData.debtorName}
                   onChange={handleInputChange}
-                  required
                   className={getInputClass(formData.debtorName)}
                   placeholder="John Smith"
                 />
@@ -483,7 +480,6 @@ export default function Home() {
                   name="debtorAddress"
                   value={formData.debtorAddress}
                   onChange={handleInputChange}
-                  required
                   className={getInputClass(formData.debtorAddress)}
                   placeholder="123 High Street, London, SW1A 1AA"
                 />
@@ -499,7 +495,6 @@ export default function Home() {
                   name="debtorEmail"
                   value={formData.debtorEmail}
                   onChange={handleInputChange}
-                  required={formData.deliveryMethod === 'email'}
                   className={formData.deliveryMethod === 'email' ? getInputClass(formData.debtorEmail) : "w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"}
                   placeholder="john.smith@example.com"
                 />
@@ -557,7 +552,6 @@ export default function Home() {
                   name="amountOwed"
                   value={formData.amountOwed}
                   onChange={handleInputChange}
-                  required
                   min="0"
                   step="0.01"
                   className={getInputClass(formData.amountOwed)}
@@ -629,7 +623,6 @@ export default function Home() {
                   name="claimDescription"
                   value={formData.claimDescription}
                   onChange={handleInputChange}
-                  required
                   rows={3}
                   maxLength={200}
                   className={`w-full px-4 py-2 border rounded-md focus:ring-2 focus:border-transparent ${
