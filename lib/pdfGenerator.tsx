@@ -1,5 +1,5 @@
 import React from 'react';
-import { Document, Page, Text, View, StyleSheet, Font } from '@react-pdf/renderer';
+import { Document, Page, Text, View, StyleSheet, Font, Image } from '@react-pdf/renderer';
 import { LetterData } from '@/types';
 import { generateLetter } from './letterTemplate';
 import { format } from 'date-fns';
@@ -93,8 +93,14 @@ export const LetterPDF: React.FC<LetterPDFProps> = ({ data }) => {
       <Page size="A4" style={styles.page}>
         {/* Header with Logo */}
         <View style={styles.header}>
-          <Text style={styles.logo}>SMART SETTLE GO</Text>
-          <Text style={styles.tagline}>Professional Debt Recovery Services</Text>
+          {data.logo ? (
+            <Image src={data.logo} style={{ width: 150, height: 'auto', marginBottom: 10 }} />
+          ) : (
+            <>
+              <Text style={styles.logo}>SMART SETTLE GO</Text>
+              <Text style={styles.tagline}>Professional Debt Recovery Services</Text>
+            </>
+          )}
         </View>
 
         {/* Date */}
@@ -120,15 +126,24 @@ export const LetterPDF: React.FC<LetterPDFProps> = ({ data }) => {
 
         {/* Signature Box */}
         <View style={{ marginTop: 20, marginBottom: 10 }}>
-          <View style={{
-            borderBottom: '1pt solid #000',
-            width: 200,
-            paddingBottom: 30,
-            marginBottom: 5
-          }}>
-            {/* Placeholder for handwritten signature - in future, this can be an actual image */}
-          </View>
-          <Text style={styles.signature}>{letterContent.signature}</Text>
+          {data.signature ? (
+            <View style={{ marginBottom: 5 }}>
+              <Image src={data.signature} style={{ width: 150, height: 'auto', marginBottom: 5 }} />
+              <Text style={styles.signature}>{letterContent.signature}</Text>
+            </View>
+          ) : (
+            <>
+              <View style={{
+                borderBottom: '1pt solid #000',
+                width: 200,
+                paddingBottom: 30,
+                marginBottom: 5
+              }}>
+                {/* Space for handwritten signature */}
+              </View>
+              <Text style={styles.signature}>{letterContent.signature}</Text>
+            </>
+          )}
         </View>
 
         {/* Bank Details (if provided) */}

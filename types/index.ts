@@ -40,6 +40,10 @@ export interface LetterData {
 
   // Supporting documents
   attachments?: Attachment[];
+
+  // Branding
+  logo?: string; // base64 encoded image
+  signature?: string; // base64 encoded image
 }
 
 export interface LetterContent {

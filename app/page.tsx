@@ -35,6 +35,23 @@ export default function Home() {
   const [claimValidation, setClaimValidation] = useState<ReturnType<typeof validateClaimDescription> | null>(null);
   const [uploadingFile, setUploadingFile] = useState(false);
 
+  // Calculate form completion percentage
+  const calculateProgress = (): number => {
+    const requiredFields = [
+      formData.client.clientName,
+      formData.client.clientEmail,
+      formData.debtorName,
+      formData.debtorAddress,
+      formData.deliveryMethod === 'email' ? formData.debtorEmail : 'not-required',
+      formData.amountOwed,
+      formData.paymentDate,
+      formData.claimDescription,
+    ];
+
+    const filledFields = requiredFields.filter(field => field && field.toString().trim().length > 0).length;
+    return Math.round((filledFields / requiredFields.length) * 100);
+  };
+
   // Update letter preview when form changes
   useEffect(() => {
     // Check that required fields have actual content (not just whitespace)
@@ -232,12 +249,29 @@ export default function Home() {
           {/* Form Section */}
           <div className="bg-white p-8 rounded-xl shadow-2xl border border-gray-100">
             <div className="mb-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                Letter Details
-              </h2>
-              <p className="text-sm text-gray-600">
+              <div className="flex justify-between items-center mb-2">
+                <h2 className="text-2xl font-bold text-gray-900">
+                  Letter Details
+                </h2>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium text-gray-600">Progress:</span>
+                  <span className={`text-lg font-bold ${calculateProgress() === 100 ? 'text-green-600' : 'text-blue-600'}`}>
+                    {calculateProgress()}%
+                  </span>
+                </div>
+              </div>
+              <p className="text-sm text-gray-600 mb-3">
                 Fill in the information below to generate your demand letter
               </p>
+              {/* Progress Bar */}
+              <div className="w-full bg-gray-200 rounded-full h-2.5">
+                <div
+                  className={`h-2.5 rounded-full transition-all duration-300 ${
+                    calculateProgress() === 100 ? 'bg-green-600' : 'bg-blue-600'
+                  }`}
+                  style={{ width: `${calculateProgress()}%` }}
+                ></div>
+              </div>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -644,6 +678,106 @@ export default function Home() {
                   <option value="assertive">Assertive</option>
                   <option value="aggressive">Aggressive</option>
                 </select>
+              </div>
+
+              {/* Logo Upload */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Company Logo (Optional)
+                </label>
+                <p className="text-xs text-gray-600 mb-3">
+                  Upload your company logo to appear on the letterhead (PNG, JPG, max 1MB)
+                </p>
+                <div className="flex items-center gap-4">
+                  <input
+                    type="file"
+                    id="logo-upload"
+                    accept="image/png,image/jpeg,image/jpg"
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      if (file.size > 1024 * 1024) {
+                        alert('Logo file must be less than 1MB');
+                        return;
+                      }
+                      const base64 = await new Promise<string>((resolve) => {
+                        const reader = new FileReader();
+                        reader.onload = () => resolve(reader.result as string);
+                        reader.readAsDataURL(file);
+                      });
+                      setFormData(prev => ({ ...prev, logo: base64 }));
+                    }}
+                    className="hidden"
+                  />
+                  <label
+                    htmlFor="logo-upload"
+                    className="cursor-pointer px-4 py-2 bg-blue-50 text-blue-600 rounded-md hover:bg-blue-100 transition-colors text-sm font-medium"
+                  >
+                    Choose Logo
+                  </label>
+                  {formData.logo && (
+                    <div className="flex items-center gap-2">
+                      <img src={formData.logo} alt="Logo preview" className="h-10 w-auto border rounded" />
+                      <button
+                        type="button"
+                        onClick={() => setFormData(prev => ({ ...prev, logo: undefined }))}
+                        className="text-xs text-red-600 hover:text-red-800"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Signature Upload */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Signature (Optional)
+                </label>
+                <p className="text-xs text-gray-600 mb-3">
+                  Upload a signature image to personalize your letter (PNG with transparent background recommended, max 500KB)
+                </p>
+                <div className="flex items-center gap-4">
+                  <input
+                    type="file"
+                    id="signature-upload"
+                    accept="image/png,image/jpeg,image/jpg"
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      if (file.size > 512 * 1024) {
+                        alert('Signature file must be less than 500KB');
+                        return;
+                      }
+                      const base64 = await new Promise<string>((resolve) => {
+                        const reader = new FileReader();
+                        reader.onload = () => resolve(reader.result as string);
+                        reader.readAsDataURL(file);
+                      });
+                      setFormData(prev => ({ ...prev, signature: base64 }));
+                    }}
+                    className="hidden"
+                  />
+                  <label
+                    htmlFor="signature-upload"
+                    className="cursor-pointer px-4 py-2 bg-blue-50 text-blue-600 rounded-md hover:bg-blue-100 transition-colors text-sm font-medium"
+                  >
+                    Choose Signature
+                  </label>
+                  {formData.signature && (
+                    <div className="flex items-center gap-2">
+                      <img src={formData.signature} alt="Signature preview" className="h-12 w-auto border rounded bg-white p-1" />
+                      <button
+                        type="button"
+                        onClick={() => setFormData(prev => ({ ...prev, signature: undefined }))}
+                        className="text-xs text-red-600 hover:text-red-800"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Supporting Documents */}
